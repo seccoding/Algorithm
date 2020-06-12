@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 
@@ -42,6 +43,76 @@ namespace Algorithm
             this.PosX = posX;
             this._board = board;
 
+            //RightHand();
+            BFS();
+        }
+
+        private void BFS()
+        {
+
+            int[] deltaY = new int[] { -1, 0, 1, 0 };
+            int[] deltaX = new int[] { 0, -1, 0, 1};
+
+            bool[,] found = new bool[_board.Size, _board.Size];
+            Pos[,] parent = new Pos[_board.Size, _board.Size];
+
+            Queue<Pos> q = new Queue<Pos>();
+            q.Enqueue(new Pos(PosY, PosX));
+            found[PosY, PosX] = true;
+            parent[PosY, PosX] = new Pos(PosY, PosX);
+
+            Pos pos;
+            int nowY;
+            int nowX;
+
+            int nextY;
+            int nextX;
+            while ( q.Count > 0 )
+            {
+                pos = q.Dequeue();
+                nowY = pos.Y;
+                nowX = pos.X;
+
+                for ( int i = 0; i < 4; i++ )
+                {
+                    nextY = nowY + deltaY[i];
+                    nextX = nowX + deltaX[i];
+
+                    if (nextX < 0 || nextX >= _board.Size || nextY < 0 || nextY >= _board.Size)
+                        continue;
+
+                    if (_board.Tile[nextY, nextX] == Board.TileType.Wall)
+                        continue;
+
+                    if (found[nextY, nextX])
+                        continue;
+
+                    q.Enqueue(new Pos(nextY, nextX));
+                    found[nextY, nextX] = true;
+                    parent[nextY, nextX] = new Pos(nowY, nowX);
+                }
+            }
+
+            // BFS 역순으로 길 찾기
+            int y = _board.DestY;
+            int x = _board.DestX;
+
+            Pos parentPos;
+            while( parent[y, x].Y != y || parent[y, x].X != x  )
+            {
+                _points.Add(new Pos(y, x));
+
+                parentPos = parent[y, x];
+                y = parentPos.Y;
+                x = parentPos.X;
+            }
+
+            _points.Add(new Pos(y, x));
+            _points.Reverse();
+        }
+
+        private void RightHand()
+        {
             // 현재 바라보고 있는 방향을 기준으로, 좌표 변화를 나타낸다.
             int[] frontY = new int[] { -1, 0, 1, 0 };
             int[] frontX = new int[] { 0, -1, 0, 1 };
@@ -51,10 +122,10 @@ namespace Algorithm
             _points.Add(new Pos(PosX, PosY));
 
             // 목적지까지 모든 경로 계산.
-            while ( PosY != this._board.DestY || PosX != this._board.DestX )
+            while (PosY != this._board.DestY || PosX != this._board.DestX)
             {
                 // 1. 현재 바라보는 방향을 기준으로 오른쪽으로 갈 수 있는지 확인
-                if (_board.Tile[PosY + rightY[_dir], PosX + rightX[_dir]] == Board.TileType.Empty )
+                if (_board.Tile[PosY + rightY[_dir], PosX + rightX[_dir]] == Board.TileType.Empty)
                 {
                     // 오른쪽 방향으로 90도 회전
                     _dir = (_dir - 1 + 4) % 4; // ex => (3 - 1 + 4) % 4 = 2
