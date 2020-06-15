@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Algorithm
 {
+    /**
+     * AStar 우선순위 큐
+     */
     class PriorityQueue<T> where T : IComparable<T>
     {
         // 2진 힙트리
