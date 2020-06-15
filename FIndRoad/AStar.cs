@@ -78,7 +78,7 @@ namespace Algorithm
                 //제일 좋은 후보를 찾는다.
                 node = pq.Pop();
 
-                // 동일한 좌표를 여러 경로로 찾아서, 더 빠른 경로로 인해서 이미 방문된 경우 싑
+                // 동일한 좌표를 여러 경로로 찾아서, 더 빠른 경로로 인해서 이미 방문된 경우 스킵
                 if (closed[node.Y, node.X])
                     continue;
 
